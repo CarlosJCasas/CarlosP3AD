@@ -21,8 +21,6 @@ public class ModulosVO {
 		this.mListaModulos = listaModulos;
 	}
 	
-	public void addModulo(ModuloVO modulo) {
-		mListaModulos.add(modulo);
-	}
+	
 	
 }

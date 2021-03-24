@@ -16,7 +16,5 @@ public class CiclosVO {
         this.ciclos = ciclos;
     }
 
-    public void addCiclos(CicloVO ciclo) {
-    	ciclos.add(ciclo);
-	}
+    
 }
