@@ -14,6 +14,10 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+
+import controlador.AlumnosController;
+import modelo.vo.ModuloVO;
+
 import javax.swing.JComboBox;
 
 public abstract class ModulosUI {
@@ -69,7 +73,7 @@ public abstract class ModulosUI {
 	 * 
 	 * @return
 	 */
-	protected abstract List<String[]> transformarListaVO();
+	protected abstract List<ModuloVO> transformarListaVO();
 
 	/**
 	 * En este método deben recuperarse todos los ciclos que se deseen mostrar en el
@@ -171,9 +175,12 @@ public abstract class ModulosUI {
 			public void mouseClicked(MouseEvent arg0) {
 				int horas = 0;
 				try {
-					horas = Integer.parseInt(horasTextField.getText());
+					if(!horasTextField.getText().isEmpty()) {
+						horas = Integer.parseInt(horasTextField.getText());
+					}
 				} catch (NumberFormatException e) {
-					System.out.println("Introduce un númmero.");
+					JOptionPane.showMessageDialog(frame,
+							"Las horas deben ser un número.");
 					
 				}
 
@@ -182,16 +189,16 @@ public abstract class ModulosUI {
 						agregarModulo(nombreTextField.getText(), cicloComboBox.getSelectedIndex(), horas,
 								cursoTextField.getText());
 					} catch (NumberFormatException e) {
-						System.out.println("Introduce un númmero.");
-						e.printStackTrace();
+						JOptionPane.showMessageDialog(frame,
+								"AGREGAR MOD CURSO tiene que ser numero?");
 					}
 				} else {
 					try {
 						editarModulo(id, nombreTextField.getText(), cicloComboBox.getSelectedIndex(),
 								cursoTextField.getText(), horas);
 					} catch (NumberFormatException e) {
-						System.out.println("Introduce un númmero.");
-						e.printStackTrace();
+						JOptionPane.showMessageDialog(frame,
+								"EditarModulo CURSO tiene que ser numero?");
 					}
 				}
 				clearFields();
@@ -281,9 +288,10 @@ public abstract class ModulosUI {
 		tm.addColumn("Curso");
 		tm.addColumn("Horas");
 		tm.addColumn("ID");
-		for (String[] s : transformarListaVO()) {
-			s[1] = getCicloNombre(Integer.parseInt(s[1]));
-			tm.addRow(s);
+		for (ModuloVO s : transformarListaVO()) {
+			tm.addRow(new String[] { s.getNombre(), getCicloNombre(s.getCiclo()),
+					String.valueOf(s.getCurso()), String.valueOf(s.getHoras()),
+					String.valueOf(s.getId()) });
 		}
 
 		table.setModel(tm);
@@ -330,13 +338,15 @@ public abstract class ModulosUI {
 	}
 
 	private void verAlumnosDeModulo() {
-		// TODO Lanzar interfaz matricula
-		JOptionPane.showMessageDialog(null, "Esta funcionalidad aún no está implementada. Disculpe las molestias");
+		
+		AlumnosController alumnosController = new AlumnosController(id);
+		alumnosController.show();
+
 	}
 
 	private void verAlumnos() {
-		// TODO Lanzar interfaz alumnos
-		verAlumnosDeModulo();
+		AlumnosController alumnosController = new AlumnosController();
+		alumnosController.show();
 	}
 
 	class ComboxItem {

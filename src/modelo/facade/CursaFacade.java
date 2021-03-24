@@ -1,6 +1,10 @@
 package modelo.facade;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,96 +26,50 @@ public class CursaFacade {
 	
 	}
 	
-	public static void addCursa() {
-		try {
-			
-			listaCursa = new ArrayList<CursaVO>();
-			CursaVO cursa = new CursaVO();
-			cursa.setAnho("");
-			cursa.setNota(0);
-			listaCursa.add(cursa);
-			
-			CursanVO cursan = new CursanVO();
-			cursan.setListaCursa(listaCursa);
-
-			File file = new File("src\\cursaXML.xml");
-			JAXBContext context = JAXBContext.newInstance(CursaVO.class);
-			Marshaller marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(cursan, file);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	public static void addCursa(CursaVO cursa) throws SQLException {
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String query ="INSERT INTO alumno_modulo (alumno_id, modulo_id, anho, nota) VALUES ('"+cursa.getDni()+"',"+cursa.getIdModulo()+",'"+cursa.getAnho()+"',"+cursa.getNota()+")";
+		statement.executeUpdate(query);
+		statement.close();
+		connection.close();
 	}
 
-	public static void listadoCursa() {
-		JAXBContext ctx;
-		try {
-			ctx = JAXBContext.newInstance(CursaVO.class);
-			Unmarshaller ums=ctx.createUnmarshaller();
-			CursanVO cursan=(CursanVO)ums.unmarshal(new File("src\\cursaXML.xml"));
-			
-			for(CursaVO cur : cursan.getListaCursa()) {
-				cur.toString();
-			}
-			
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public static List<CursaVO> listadoCursa() throws SQLException {
+		List<CursaVO> listaCursan = new ArrayList<>();
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String query ="SELECT alumno_id, modulo_id, anho, nota FROM alumno_modulo ORDER BY alumno_id";
+		ResultSet resultSet = statement.executeQuery(query);
+		while (resultSet.next()) {
+			String alDni = resultSet.getString("alumno_id");
+			int modId = resultSet.getInt("modulo_id");
+			String year = resultSet.getString("anho");
+			Double nota = resultSet.getDouble("nota");
+			listaCursan.add(new CursaVO(alDni, modId, year, nota));
 		}
-		
+		statement.close();
+		connection.close();
+		return listaCursan;
 	}
 
-	public static void actualizarCursa(Integer id, String dni) {
-		
-			try {
-				ModuloVO modulo = new ModuloVO();
-				AlumnoVO alumno = new AlumnoVO();
-				CursaVO cursa = new CursaVO();
-				for (int i = 0 ; i<listaCursa.size(); i++) {
-					if (alumno.getDni().equals(dni) && modulo.getId().equals(id)) {
-						listaCursa.set(i, cursa);
-					}
-				}
-				CursanVO cursan = new CursanVO();
-				cursan.setListaCursa(listaCursa);
-				File file = new File("src\\cursaXML.xml");
-				JAXBContext context = JAXBContext.newInstance(CursaVO.class);
-				Marshaller marshaller = context.createMarshaller();
-				marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-				marshaller.marshal(cursan, file);
-			} catch (JAXBException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			
+	public static void actualizarCursa(Integer idmod, String dnial, String anho, Double nota) throws SQLException {
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String query ="UPDATE alumno_modulo SET alumno_id ='"+dnial+"', modulo_id ="
+		+idmod+",anho = '"+anho+"', nota ="+nota;
+		statement.executeUpdate(query);
+		statement.close();
+		connection.close();
 	}
 
-	public static void eliminarCursa(Integer id, String dni) {
-		
-		try {
-			ModuloVO modulo = new ModuloVO();
-			AlumnoVO alumno = new AlumnoVO();
-			CursaVO cursa = new CursaVO();
-			for (int i = 0 ; i<listaCursa.size(); i++) {
-				if (alumno.getDni().equals(dni) && modulo.getId().equals(id)) {
-					listaCursa.remove(i);
-				}
-			}
-			CursanVO cursan = new CursanVO();
-			cursan.setListaCursa(listaCursa);
-			File file = new File("src\\cursaXML.xml");
-			JAXBContext context = JAXBContext.newInstance(CursaVO.class);
-			Marshaller marshaller = context.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.marshal(cursan, file);
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+	public static void eliminarCursa(Integer id, String dni) throws SQLException {
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+	
+		String query ="DELETE FROM alumno_modulo WHERE alumno_id ='"+dni+"' AND modulo_id = "+id;
+		statement.executeUpdate(query);
+		statement.close();
+		connection.close();
 	}
 }

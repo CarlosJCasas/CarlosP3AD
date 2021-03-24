@@ -1,17 +1,14 @@
 package modelo.facade;
 
-import java.io.File;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
 import modelo.vo.ModuloVO;
-import modelo.vo.ModulosVO;
 
 public class ModuloFacade {
 
@@ -19,123 +16,53 @@ public class ModuloFacade {
 
 	}
 
-	public static void addModulo(String nombre, int ciclo, int horas, String curso) {
+	public static void addModulo(String nombre, int ciclo, int horas, String curso) throws SQLException {
 		ModuloVO modulo = new ModuloVO(null, nombre, ciclo, horas, curso);
-		try {
-			JAXBContext context;
-			context = JAXBContext.newInstance(ModulosVO.class);
-			Unmarshaller unmarsh = context.createUnmarshaller();
-			File file = new File("src\\modulosXML.xml");
-			ModulosVO listaModulos = (ModulosVO) unmarsh.unmarshal(file);
-			if (listaModulos != null) {
-				int mayor = 0;
-				// If the list of ModuloVO is not empty search wich one has the higher id in the
-				// list
-				if (!listaModulos.getModulos().isEmpty()) {
-					for (ModuloVO mod : listaModulos.getModulos()) {
-						if (mod.getId() > mayor) {
-							mayor = mod.getId();
-						}
-					}
-					modulo.setId(mayor + 1);
-				} else {
-					modulo.setId(mayor);
-				}
-				listaModulos.addModulo(modulo);
-				Marshaller marsh = context.createMarshaller();
-				marsh.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-				marsh.marshal(listaModulos, file);
-			}
-		} catch (JAXBException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String queryInsert = "INSERT INTO modulo (nombre, curso, horas, idciclo) VALUES ('"+ nombre + "','" +curso+"',"+horas+","+ciclo+")";
+		statement.executeUpdate(queryInsert);
+		statement.close();
+		connection.close();
 
 	}
 
-	public static List<String[]> listadoModulo() {
-		//List of an Array of strings
-		//Each item is a List<String> of ModuloVO attributes
-		List<String[]> listadoModulos = new ArrayList<String[]>();
-		try {
-			JAXBContext context = JAXBContext.newInstance(ModulosVO.class);
-			Unmarshaller unmarsh = context.createUnmarshaller();
-			File file = new File("src\\modulosXML.xml");
-			ModulosVO modulos = (ModulosVO) unmarsh.unmarshal(file);
-			
-			// Modulos.getmodulos() return a List<ModuloVO>
-			//If the list is not empty list each ModuloVO in a String[]
-			if (!modulos.getModulos().isEmpty()) {
-				String[] itemsModulo;
-				for(ModuloVO modulo : modulos.getModulos()) {
-					itemsModulo = new String[5];
-					itemsModulo[0]=modulo.getNombre();
-					itemsModulo[1]=""+modulo.getCiclo();
-					itemsModulo[2]=modulo.getCurso();
-					itemsModulo[3]=""+modulo.getHoras();
-					itemsModulo[4]=""+modulo.getId();
-					listadoModulos.add(itemsModulo);
-				}
-			}
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public static List<ModuloVO> listadoModulo() throws SQLException {
+		List<ModuloVO> listaModulos = new ArrayList<>();
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String query = "SELECT id, nombre, curso, horas, idciclo FROM modulo ORDER BY nombre";
+		ResultSet resultSet = statement.executeQuery(query);
+		while(resultSet.next()) {
+			int id = resultSet.getInt("id");
+			String name = resultSet.getString("nombre");
+			String course = resultSet.getString("curso");
+			int horas = resultSet.getInt("horas");
+			int idciclo = resultSet.getInt("idciclo");
+			listaModulos.add(new ModuloVO(id, name, idciclo, horas, course));
 		}
-		return listadoModulos;
-
+		statement.close();
+		connection.close();
+		return listaModulos;
 	}
 
-	public static void actualizarModulo(Integer id, String nombre, int ciclo, String curso, int horas) {
-		JAXBContext context;
-		try {
-			context = JAXBContext.newInstance(ModulosVO.class);
-			Unmarshaller unmarsh = context.createUnmarshaller();
-			File file = new File("src\\modulosXML.xml");
-			ModulosVO listaModulos = (ModulosVO) unmarsh.unmarshal(file);
-			
-			if(listaModulos != null) {
-				for(ModuloVO mod : listaModulos.getModulos()) {
-					if(mod.getId() == id) {
-						mod.setNombre(nombre);
-						mod.setCiclo(ciclo);
-						mod.setCurso(curso);
-						mod.setHoras(horas);
-					}
-				}
-				Marshaller marsh = context.createMarshaller();
-				marsh.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-				marsh.marshal(listaModulos, file);
-			}
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public static void actualizarModulo(Integer id, String nombre, int ciclo, String curso, int horas) throws SQLException {
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String query = "UPDATE modulo SET nombre = '" + nombre + "', curso =" + curso + ", horas = "+horas+", idciclo="+ ciclo +"WHERE id =" + id;
+		statement.executeUpdate(query);
+		statement.close();
+		connection.close();
 		
 	}
 
-	public static void eliminarModulo(Integer id) {
-		JAXBContext context;
-		try {
-			context = JAXBContext.newInstance(ModulosVO.class);
-			Unmarshaller unmarsh = context.createUnmarshaller();
-			File file = new File("src\\modulosXML.xml");
-			ModulosVO listaModulos = (ModulosVO) unmarsh.unmarshal(file);
-			if(listaModulos!=null) {
-				for(ModuloVO modulo : listaModulos.getModulos()) {
-					if(modulo.getId().equals(id));
-					listaModulos.getModulos().remove(modulo);
-					break;
-				}
-			}
-			
-			Marshaller marsh = context.createMarshaller();
-			marsh.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marsh.marshal(listaModulos, file);
-			
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public static void eliminarModulo(Integer id) throws SQLException {
+		Connection connection = DataBaseConnection.getConnection();
+		Statement statement = connection.createStatement();
+		String query = "DELETE FROM modulo WHERE id =" + id;
+		statement.executeUpdate(query);
+		statement.close();
+		connection.close();
 	
 	}
 

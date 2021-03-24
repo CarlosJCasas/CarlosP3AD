@@ -5,13 +5,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(propOrder = {"nombre", "curso", "ciclo", "horas"})
+
 public class ModuloVO {
-	private int horas, ciclo;
+	private int horas, idCiclo;
 	private String nombre, curso;
 	private Integer id;
-	
-	
 	
 	public ModuloVO() {
 		
@@ -21,7 +19,7 @@ public class ModuloVO {
 	public ModuloVO(Integer id ,String nombre,int ciclo,int horas,String curso ) {
 		
 		this.horas = horas;
-		this.ciclo = ciclo;
+		this.idCiclo = ciclo;
 		this.nombre = nombre;
 		this.curso = curso;
 		this.id = id;
@@ -29,7 +27,7 @@ public class ModuloVO {
 	public Integer getId() {
 		return id;
 	}
-	@XmlAttribute
+	
 	public void setId(Integer id) {
 		this.id = id;
 	}
@@ -55,11 +53,11 @@ public class ModuloVO {
 		this.nombre = nombre;
 	}
 	public int getCiclo() {
-		return ciclo;
+		return idCiclo;
 	}
 	
 	public void setCiclo(int ciclo) {
-		this.ciclo = ciclo;
+		this.idCiclo = ciclo;
 	}
 	
 	

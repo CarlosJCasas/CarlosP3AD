@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
-@XmlRootElement
+
 public class AlumnosVO {
 	private List<AlumnoVO> alumnos;
 
@@ -21,7 +21,7 @@ public class AlumnosVO {
 	public List<AlumnoVO> getListadoAlumnos() {
 		return alumnos;
 	}
-	@XmlElement(name="alumno")
+
 	public void setListadoAlumnos(List<AlumnoVO> listadoAlumnos) {
 		this.alumnos = listadoAlumnos;
 	}
