@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<modulos>
-    <modulos id="0">
-        <nombre>Carlos</nombre>
-        <curso>Nas</curso>
-        <ciclo>1</ciclo>
-        <horas>3</horas>
-    </modulos>
-</modulos>

@@ -2,6 +2,7 @@ package vista;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -63,8 +64,9 @@ public abstract class ModulosUI {
 
 	/**
 	 * Elimina un modulo seleccionado
+	 * @throws SQLException 
 	 */
-	protected abstract void eliminarModulo(Integer id);
+	protected abstract void eliminarModulo(Integer id) throws SQLException;
 
 	/**
 	 * En este metodo deben implementarse las funcionalidades necesarias para
@@ -230,7 +232,12 @@ public abstract class ModulosUI {
 							"El módulo " + getNombre() + " se eliminará de forma permanente", "Eliminar",
 							JOptionPane.OK_CANCEL_OPTION);
 					if (res == JOptionPane.OK_OPTION) {
-						eliminarModulo(id);
+						try {
+							eliminarModulo(id);
+						} catch (SQLException e) {
+							JOptionPane.showMessageDialog(frame,
+									"No se puede eliminar el modulo, contiene alumnos asociados a el.");
+						}
 						clearFields();
 						recargarTabla();
 					}

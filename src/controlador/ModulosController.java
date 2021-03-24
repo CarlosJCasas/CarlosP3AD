@@ -33,15 +33,12 @@ public class ModulosController extends ModulosUI {
 	}
 
 	@Override
-	protected void eliminarModulo(Integer idModulo) {
+	protected void eliminarModulo(Integer idModulo) throws SQLException {
 		// TODO Auto-generated method stub
 		
-		try {
+		
 			ModuloFacade.eliminarModulo(idModulo);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 	
 	@Override
